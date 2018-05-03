@@ -39,27 +39,27 @@ def parse_dataset(dataset, outdir, _max=10000, label=False):
     :param _max: maximum images to download (change to download all dataset)
     :return: list of tuple containing absolute path and url of image
     """
-    if not label:
-        _fnames_urls = []
-        with open(dataset, 'r') as f:
-            data = json.load(f)
-            for image in data["images"]:
-                url = image["url"]
-                fname = os.path.join(outdir, "{}.jpg".format(image["imageId"]))
-                _fnames_urls.append((fname, url))
-        return _fnames_urls[:_max]
-    else:
-        _fnames_urls = []
-        with open(dataset, 'r') as f:
-            data = json.load(f)
-            for image in data["annotations"]:
-                url = ""
-                for i in image["labelId"]:
-                    url = url+i+"\n"
-                #url = image["labelId"]
-                fname = os.path.join(outdir, "{}.jpg.txt".format(image["imageId"]))
-                _fnames_urls.append((fname, url))
-        return _fnames_urls[:_max]
+    #if label == False:
+    _fnames_urls = []
+    with open(dataset, 'r') as f:
+        data = json.load(f)
+        for image in data["images"]:
+            url = image["url"]
+            fname = os.path.join(outdir, "{}.jpg".format(image["imageId"]))
+            _fnames_urls.append((fname, url))
+    #    return _fnames_urls[:_max]
+    #else:
+    #_fnames_urls = []
+    #with open(dataset, 'r') as f:
+    #    data = json.load(f)
+    #    for image in data["annotations"]:
+    #        url = ""
+    #        for i in image["labelId"]:
+    #            url = url+i+"\n"
+    #        #url = image["labelId"]
+    #        fname = os.path.join(outdir, "{}.jpg.txt".format(image["imageId"]))
+    #        _fnames_urls.append((fname, url))
+    return _fnames_urls[:_max]
 def save_file(fnames_and_label):
     fname, label = fnames_and_label
     if not os.path.exists(fname):
@@ -78,20 +78,20 @@ if __name__ == '__main__':
     #else:
     #    quality = int(quality)
     # parse json dataset file
-    #if not label:
+    #if label == "F":
     fnames_urls = parse_dataset(data_path, out_path, _max = int(num_pic))
 
     # download data
-    pool = multiprocessing.Pool(processes=8)
+    pool = multiprocessing.Pool(processes=16)
     with tqdm(total=len(fnames_urls)) as progress_bar:
         for _ in pool.imap_unordered(download_image, fnames_urls):
             progress_bar.update(1)
     #else:
-    #    fnames_urls = parse_dataset(data_path, out_path, _max = int(num_pic), label=label)
-    #    pool = multiprocessing.Pool(processes=8)
-    #    with tqdm(total=len(fnames_urls)) as progress_bar:
-    #        for _ in pool.imap_unordered(save_file, fnames_urls):
-    #            progress_bar.update(1)    
+    #fnames_urls = parse_dataset(data_path, out_path, _max = int(num_pic), label=True)
+    #pool = multiprocessing.Pool(processes=8)
+    #with tqdm(total=len(fnames_urls)) as progress_bar:
+    #    for _ in pool.imap_unordered(save_file, fnames_urls):
+    #        progress_bar.update(1)    
     sys.exit(1)
     
     #if len(sys.argv) != 3:
